@@ -1,11 +1,11 @@
 import pygame
-import csv
-from world_gen import world_output
 
 
 
 windowWidth = 800
 windowHeight = 600
+chunkWidth = 95
+chunkHeight = 35
 TILE_SIZE = 32
 FPS = 60
 BLOCKS_LAYER = 2
@@ -29,32 +29,6 @@ GREEN = (0, 255, 0)
 
 PARTICLE_COLOR = (255, 255, 255)
 
-
-def load_tilemap_from_csv(path):
-    with open(path, newline='') as csvfile:
-        tilemap = [row for row in csv.reader(csvfile)]
-        tilemap2 = []
-        for line in tilemap:
-            tilemap2.append(line[0])
-
-        return tilemap2
-    
-
-    
-def ensure_player_spawn(tilemap):
-    has_player = any('P' in row for row in tilemap)
-    if not has_player:
-        for y, row in enumerate(tilemap):
-            for x, cell in enumerate(row):
-                if cell == ' ':
-                    row[x] = 'P'
-                    return  # Exit once placed
-
-world_output()  # Generate the world and save to CSV
-
-tilemap = load_tilemap_from_csv("map.csv")
-
-ensure_player_spawn(tilemap)
 
 
         

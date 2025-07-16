@@ -3,6 +3,7 @@ import sys
 import pygame
 from Sprites import *
 from items import *
+from world_gen import world_output, load_tilemap_from_csv
 
 class Spritesheet:
     def __init__(self, path):
@@ -19,6 +20,8 @@ class Spritesheet:
 
 
 class Game:
+
+    tilemap = []
 
     def __init__(self):
         self.screen = pygame.display.set_mode((windowWidth, windowHeight))
@@ -42,28 +45,37 @@ class Game:
         self.collided = False
         self.enemy_collided = False
         self.block_collided = False
-        self.create_tilemap()
+        self.create_chunk(0, 0)
         
 
         # Add camera
-        self.camera = camera(len(tilemap[0]) * TILE_SIZE, len(tilemap) * TILE_SIZE)
+        self.camera = camera(len(self.tilemap[0]) * TILE_SIZE, len(self.tilemap) * TILE_SIZE)
         
 
     
-    def create_tilemap(self):
+    def create_tilemap(self, tilemap, x, y):
         for i, row in enumerate(tilemap):
             for j, column in enumerate(row):
-                Ground(self,j,i)
+                Ground(self,j+y,i+x)
                 if column == 'B':
-                    Block(self,j,i)
+                    Block(self,j+y,i+x)
                 if column == 'P':
-                    self.player = Player(self,j,i)
+                    self.player = Player(self,j+y,i+x)
                 if column == 'E':
-                    self.enemy = Enemy(self,j,i)
+                    self.enemy = Enemy(self,j+y,i+x)
                 if column == 'R':
-                    Water(self,j,i)
+                    Water(self,j+y,i+x)
                 if column == 'W':
-                    Weapon(j,i,self)
+                    Weapon(j+y,i+x,self)
+
+    def create_chunk(self, x, y):
+        world_output()
+        self.tilemap = load_tilemap_from_csv("map.csv")
+        self.create_tilemap(self.tilemap, x, y)
+        
+
+
+        
 
     def create(self):
         self.all_sprites = pygame.sprite.LayeredUpdates()
@@ -74,7 +86,7 @@ class Game:
         self.weapons = pygame.sprite.LayeredUpdates()
         self.bullets = pygame.sprite.LayeredUpdates()
         self.healthbar = pygame.sprite.LayeredUpdates()
-        self.create_tilemap()
+        self.create_tilemap(self.tilemap, 0, 0)
 
     def update(self):
         self.all_sprites.update()
@@ -132,16 +144,22 @@ class camera:
 
     def update(self, target):
         # Center the camera on the player
-        x = -target.rect.x + (windowWidth // 2)
-        y = -target.rect.y + (windowHeight // 2)
+        print(target.rect.x, target.rect.y)
+        old_x = -target.rect.x + (windowWidth // 2)
+        old_y = -target.rect.y + (windowHeight // 2)
 
         # Keep the camera within bounds
-        x = min(0, x)  # Left boundary
-        y = min(0, y)  # Top boundary
+        x = min(0, old_x)  # Left boundary
+        y = min(0, old_y)  # Top boundary
         x = max(-(self.width - windowWidth), x)  # Right boundary
         y = max(-(self.height - windowHeight), y)  # Bottom boundary
 
-        self.camera = pygame.Rect(x, y, self.width, self.height)
+        self.camera = pygame.Rect(x, y, self.width, self.height)    
+
+
+        if y >= -(self.height - windowHeight) and game.gen_north == False:
+            game.create_chunk(0,chunkHeight)
+            game.gen_north = True
 
     
 

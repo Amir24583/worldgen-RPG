@@ -1,10 +1,12 @@
 import random
 import sys
+import csv
+from configuration import *
 
 
 def procedural_map_generator():
-	width = 95
-	height = 35
+	width = chunkWidth
+	height = chunkHeight
 
 	drunk = {
 		'waterCountdown': 20,
@@ -49,9 +51,9 @@ def procedural_map_generator():
 
 
 	# Place player
-	empty_tiles = find_empty_tiles()
-	player_x, player_y = random.choice(empty_tiles)
-	level[player_y][player_x] = 'P'
+	# empty_tiles = find_empty_tiles()
+	# player_x, player_y = random.choice(empty_tiles)
+	# level[player_y][player_x] = 'P'
 
 	# Place some weapons
 	for _ in range(3):
@@ -95,12 +97,44 @@ def procedural_map_generator():
 			if roll == 4 and y < height - 1 - drunk['padding']:
 				drunk['y'] += 1
 
+	ensure_player_spawn(level)
+
 
 # make all 4 borders blank as of now only top is borderless
 	level[0] = (['B'] * 2) + ([' '] * (width - 4)) + (['B'] * 2)
 	level[1] = (['B'] * 2) + ([' '] * (width - 4)) + (['B'] * 2) 
 	for row in level:
 		print( ''.join(row).replace(' ', '.') )
+
+
+def load_tilemap_from_csv(path):
+    with open(path, newline='') as csvfile:
+        tilemap = [row for row in csv.reader(csvfile)]
+        tilemap2 = []
+        for line in tilemap:
+            tilemap2.append(line[0])
+
+        return tilemap2
+    
+
+executed = False   
+def ensure_player_spawn(tilemap):
+
+	global executed
+	if not executed:
+		executed = True
+	else:
+		return
+
+	has_player = any('P' in row for row in tilemap)
+	if not has_player:
+		for y, row in enumerate(tilemap):
+			for x, cell in enumerate(row):
+				if cell == ' ':
+					row[x] = 'P'
+					return  # Exit once placed
+
+
 
 def world_output():
 	original_stdout = sys.stdout
