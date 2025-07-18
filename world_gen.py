@@ -9,7 +9,7 @@ def procedural_map_generator():
 	height = chunkHeight
 
 	drunk = {
-		'waterCountdown': 20,
+		'waterCountdown': 40,
 		'wallCountdown': 2500,
 		'padding': 2,
 		'x': width // 2 ,
@@ -103,6 +103,8 @@ def procedural_map_generator():
 # make all 4 borders blank as of now only top is borderless
 	level[0] = (['B'] * 2) + ([' '] * (width - 4)) + (['B'] * 2)
 	level[1] = (['B'] * 2) + ([' '] * (width - 4)) + (['B'] * 2) 
+	level[33] = (['B'] * 2) + ([' '] * (width - 4)) + (['B'] * 2)
+	level[34] = (['B'] * 2) + ([' '] * (width - 4)) + (['B'] * 2)
 	for row in level:
 		print( ''.join(row).replace(' ', '.') )
 
