@@ -45,15 +45,16 @@ class Game:
         self.collided = False
         self.enemy_collided = False
         self.block_collided = False
+        self.camera_bounds = [0,0,windowWidth,windowHeight]
         self.create_chunk(0, 0)
-        
-
+       
         # Add camera
         self.camera = camera(len(self.tilemap[0]) * TILE_SIZE, len(self.tilemap) * TILE_SIZE)
         
 
     
     def create_tilemap(self, tilemap, x, y):
+        print(x,y)
         for i, row in enumerate(tilemap):
             for j, column in enumerate(row):
                 Ground(self,j+y,i+x)
@@ -91,6 +92,7 @@ class Game:
     def update(self):
         self.all_sprites.update()
         self.bullets.update()
+        print(len(self.all_sprites))
 
 
     def events(self):
@@ -144,22 +146,26 @@ class camera:
 
     def update(self, target):
         # Center the camera on the player
-        print(target.rect.x, target.rect.y)
+        # print(target.rect.x, target.rect.y)
         old_x = -target.rect.x + (windowWidth // 2)
         old_y = -target.rect.y + (windowHeight // 2)
 
         # Keep the camera within bounds
-        x = min(0, old_x)  # Left boundary
-        y = min(0, old_y)  # Top boundary
+        x = min(game.camera_bounds[0], old_x)  # Left boundary
+        y = min(game.camera_bounds[1], old_y)  # Top boundary
+
+        if y != old_y and game.gen_north == False:
+            game.create_chunk(0,-chunkHeight)
+            game.camera_bounds[1] -= self.height
+            print(game.camera_bounds)
+            game.gen_north = True
+
         x = max(-(self.width - windowWidth), x)  # Right boundary
         y = max(-(self.height - windowHeight), y)  # Bottom boundary
 
         self.camera = pygame.Rect(x, y, self.width, self.height)    
 
 
-        if y >= -(self.height - windowHeight) and game.gen_north == False:
-            game.create_chunk(0,chunkHeight)
-            game.gen_north = True
 
     
 

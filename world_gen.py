@@ -100,11 +100,17 @@ def procedural_map_generator():
 	ensure_player_spawn(level)
 
 
-# make all 4 borders blank as of now only top is borderless
+	# make all 4 borders blank as of now only top is borderless
 	level[0] = (['B'] * 2) + ([' '] * (width - 4)) + (['B'] * 2)
 	level[1] = (['B'] * 2) + ([' '] * (width - 4)) + (['B'] * 2) 
 	level[33] = (['B'] * 2) + ([' '] * (width - 4)) + (['B'] * 2)
 	level[34] = (['B'] * 2) + ([' '] * (width - 4)) + (['B'] * 2)
+
+	for i in range(len(level)):
+		level[i][0] = ' '
+		level[i][1] = ' '
+		level[i][-1] = ' '
+		level[i][-2] = ' '
 	for row in level:
 		print( ''.join(row).replace(' ', '.') )
 
@@ -119,6 +125,10 @@ def load_tilemap_from_csv(path):
         return tilemap2
     
 
+
+def find_empty_tiles(level, width, height):
+		return [(x, y) for y in range(height) for x in range(width) if level[y][x] == ' ']
+
 executed = False   
 def ensure_player_spawn(tilemap):
 
@@ -130,12 +140,9 @@ def ensure_player_spawn(tilemap):
 
 	has_player = any('P' in row for row in tilemap)
 	if not has_player:
-		for y, row in enumerate(tilemap):
-			for x, cell in enumerate(row):
-				if cell == ' ':
-					row[x] = 'P'
-					return  # Exit once placed
-
+		empty_tiles = find_empty_tiles(tilemap, chunkWidth, chunkHeight)
+		player_x, player_y = random.choice(empty_tiles)
+		tilemap[player_y][player_x] = 'P'
 
 
 def world_output():
