@@ -28,6 +28,9 @@ class Game:
         self.clock = pygame.time.Clock()
         self.running = True
         self.gen_north = False
+        self.gen_west = False
+        self.gen_south = False
+        self.gen_east = False
         self.all_sprites = pygame.sprite.Group()
         self.enemies = pygame.sprite.Group()
         self.blocks = pygame.sprite.Group()
@@ -57,17 +60,17 @@ class Game:
         print(x,y)
         for i, row in enumerate(tilemap):
             for j, column in enumerate(row):
-                Ground(self,j+y,i+x)
+                Ground(self,j+x,i+y)
                 if column == 'B':
-                    Block(self,j+y,i+x)
+                    Block(self,j+x,i+y)
                 if column == 'P':
-                    self.player = Player(self,j+y,i+x)
+                    self.player = Player(self,j+x,i+y)
                 if column == 'E':
-                    self.enemy = Enemy(self,j+y,i+x)
+                    self.enemy = Enemy(self,j+x,i+y)
                 if column == 'R':
-                    Water(self,j+y,i+x)
+                    Water(self,j+x,i+y)
                 if column == 'W':
-                    Weapon(j+y,i+x,self)
+                    Weapon(j+x,i+y,self)
 
     def create_chunk(self, x, y):
         world_output()
@@ -90,7 +93,9 @@ class Game:
         self.create_tilemap(self.tilemap, 0, 0)
 
     def update(self):
-        self.all_sprites.update()
+        for sprite in self.all_sprites:
+            if type(sprite) != Ground:
+                sprite.update()
         self.bullets.update()
         print(len(self.all_sprites))
 
@@ -146,7 +151,7 @@ class camera:
 
     def update(self, target):
         # Center the camera on the player
-        # print(target.rect.x, target.rect.y)
+        print(target.rect.x, target.rect.y)
         old_x = -target.rect.x + (windowWidth // 2)
         old_y = -target.rect.y + (windowHeight // 2)
 
@@ -156,14 +161,25 @@ class camera:
 
         if y != old_y and game.gen_north == False:
             game.create_chunk(0,-chunkHeight)
-            game.camera_bounds[1] -= self.height
+            game.camera_bounds[1] += self.height
             print(game.camera_bounds)
             game.gen_north = True
+
+        if x != old_x and game.gen_west == False:
+            game.create_chunk(-chunkWidth,0)
+            game.camera_bounds[0] += self.width
+            print(game.camera_bounds)
+            game.gen_west = True
+
+        
 
         x = max(-(self.width - windowWidth), x)  # Right boundary
         y = max(-(self.height - windowHeight), y)  # Bottom boundary
 
         self.camera = pygame.Rect(x, y, self.width, self.height)    
+        print(x,y)
+        print(old_x,old_y)
+        print()
 
 
 

@@ -58,6 +58,7 @@ class Bullet(pygame.sprite.Sprite):
         self.direction = self.game.player.direction
 
         self.damage = 1
+        self.timer = 0
 
     def move(self):
         if self.direction == 'up':
@@ -79,6 +80,11 @@ class Bullet(pygame.sprite.Sprite):
         if collide:
             collide[0].damage(self.damage)
             self.kill()
+        elif self.timer > 150:
+            self.kill()
+        else:
+            self.timer += 1
+        
         # collide = pygame.sprite.spritecollide(self, self.game.enemies, False)
         # if collide:    
         #     self.kill()
@@ -110,6 +116,7 @@ class ENEMY_Bullet(pygame.sprite.Sprite):
         self.direction = self.game.player.direction
 
         self.damage = 1
+        self.timer = 0
 
     def move(self):
         if self.direction == 'up':
@@ -129,8 +136,13 @@ class ENEMY_Bullet(pygame.sprite.Sprite):
     def collide_player(self):
         collide = pygame.sprite.spritecollide(self, self.game.mainPlayer, False)
         if collide:
+            collide[0].damage(self.damage)
             self.game.player.damage(self.damage)
             self.kill()
+        elif self.timer > 150:
+            self.kill()
+        else:
+            self.timer += 1
         # collide = pygame.sprite.spritecollide(self, self.game.enemies, False)
         # if collide:    
         #     self.kill()
